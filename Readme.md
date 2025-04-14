@@ -11,5 +11,5 @@ This project simulates a web scraping engine at scale, featuring rotating proxie
 Clone this repository and navigate into the project directory:
 
 ```bash
-git clone https://github.com/your-username/web-scraping-simulation.git
+git clone https://github.com/MabeyaG/web-scraping-simulation.git
 cd web-scraping-simulation
