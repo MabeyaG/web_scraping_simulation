@@ -1,1 +1,64 @@
+import requests
+from queue import Queue
+import random
+import time
+from threading import Thread
 
+# Simulating rotating proxies (List of proxy IPs)
+PROXIES = [
+    {"http": "http://10.10.1.1:8080"},
+    {"http": "http://10.10.1.2:8080"},
+    {"http": "http://10.10.1.3:8080"}
+]
+
+# Simulating request queue
+request_queue = Queue()
+
+# Function to simulate proxy rotation
+def get_random_proxy():
+    return random.choice(PROXIES)
+
+# Function to simulate scraping logic
+def scrape_url(url, proxy):
+    try:
+        response = requests.get(url, proxies=proxy, timeout=5)
+        print(f"Successfully scraped: {url}")
+        print(f"Status Code: {response.status_code}")
+        time.sleep(1)  # Simulate delay
+    except requests.exceptions.RequestException as e:
+        print(f"Error scraping {url}: {e}")
+
+# Function to process a queue of URLs
+def process_queue():
+    while not request_queue.empty():
+        url = request_queue.get()
+        proxy = get_random_proxy()
+        print(f"Using proxy {proxy} for {url}")
+        scrape_url(url, proxy)
+        request_queue.task_done()
+
+# Function to add URLs to the queue
+def add_urls_to_queue(urls):
+    for url in urls:
+        request_queue.put(url)
+
+# Main function to initiate scraping
+def main():
+    # List of URLs to scrape
+    urls_to_scrape = [
+        "http://example.com",
+        "http://example.org",
+        "http://example.net"
+    ]
+
+    add_urls_to_queue(urls_to_scrape)
+
+    # Create threads to process the request queue concurrently
+    for _ in range(3):
+        t = Thread(target=process_queue)
+        t.start()
+
+    request_queue.join()  # Wait for all tasks to be processed
+
+if __name__ == "__main__":
+    main()
